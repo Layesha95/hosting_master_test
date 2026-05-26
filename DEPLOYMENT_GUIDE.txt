@@ -1,0 +1,34 @@
+BOY SOFTWARE FACTORY DEPLOYMENT GUIDE
+
+LOCAL TEST:
+1. Run backend:
+   cd backend
+   python app.py
+
+2. Run frontend:
+   cd frontend
+   python -m http.server 8000
+
+ONLINE HOSTING OPTIONS:
+1. Frontend:
+   - Netlify
+   - Vercel
+   - GitHub Pages
+
+2. Backend:
+   - Render
+   - Railway
+   - PythonAnywhere
+
+3. Database:
+   - SQLite for small projects
+   - PostgreSQL for larger projects
+
+IMPORTANT:
+For online deployment, change API links from:
+http://127.0.0.1:5000
+
+to your deployed backend URL.
+
+NEXT BOY UPGRADE:
+Automatic deployment file generation.

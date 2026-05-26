@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hosting Master Business Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<div id="loginScreen" class="login-screen">
+    <div class="login-box">
+        <h2>Admin Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+</div>
+
+<div id="dashboardContent" class="dashboard-wrapper" style="display:none;">
+
+    <div class="sidebar">
+        <h2>Hosting Master Business</h2>
+        <ul>
+            <li>Dashboard</li>
+            <li>Customers</li>
+            <li>Bookings</li>
+            <li>Invoices</li>
+            <li>Reports</li>
+            <li>Settings</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <h1>Admin Dashboard</h1>
+        </div>
+
+        <div class="stats">
+            <div class="card">
+                <h3>Total Bookings</h3>
+                <p id="totalBookings">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Total Customers</h3>
+                <p id="totalCustomers">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Status</h3>
+                <p>LIVE</p>
+            </div>
+        </div>
+
+        <div class="table-section">
+            <h2>Recent Bookings</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Service</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="bookingTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+async function loadBookings() {
+
+    try {
+
+        const response = await fetch("http://127.0.0.1:5000/bookings");
+        const bookings = await response.json();
+
+        const tableBody = document.getElementById("bookingTableBody");
+        tableBody.innerHTML = "";
+
+        document.getElementById("totalBookings").innerText = bookings.length;
+        document.getElementById("totalCustomers").innerText = bookings.length;
+
+        bookings.reverse().forEach(booking => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${booking.name}</td>
+                <td>${booking.phone}</td>
+                <td>${booking.service}</td>
+                <td>${booking.date}</td>
+                <td>${booking.time}</td>
+                <td>
+                    <button class="delete-btn" onclick="deleteBooking('${booking.id}')">
+                        Delete
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+
+        });
+
+    } catch(error) {
+
+        console.error(error);
+        alert("Failed to load bookings.");
+
+    }
+
+}
+
+async function deleteBooking(id) {
+
+    const confirmDelete = confirm("Delete this booking?");
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `http://127.0.0.1:5000/booking/${id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert("Booking deleted!");
+            loadBookings();
+        } else {
+            alert("Delete failed.");
+        }
+
+    } catch(error) {
+        console.error(error);
+        alert("Server error.");
+    }
+
+}
+
+async function login() {
+
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:5000/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (result.success) {
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("dashboardContent").style.display = "flex";
+            loadBookings();
+        } else {
+            alert("Invalid login.");
+        }
+
+    } catch(error) {
+        console.error(error);
+        alert("Backend error.");
+    }
+
+}
+</script>
+
+</body>
+</html>
