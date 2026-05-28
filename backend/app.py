@@ -7,7 +7,7 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)
 
-DB_FILE = os.path.join("..", "database", "business.db")
+DB_FILE = "business.db"
 
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "1234"
