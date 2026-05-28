@@ -14,7 +14,11 @@ ADMIN_PASSWORD = "1234"
 
 
 def init_db():
-    os.makedirs(os.path.dirname(DB_FILE), exist_ok=True)
+    db_folder = os.path.dirname(DB_FILE)
+
+    if db_folder:
+        os.makedirs(db_folder, exist_ok=True)
+
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
@@ -102,6 +106,8 @@ def create_booking():
 
 @app.route("/bookings", methods=["GET"])
 def get_bookings():
+    init_db()
+
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
@@ -121,6 +127,8 @@ def get_bookings():
 
 @app.route("/booking/<int:booking_id>", methods=["DELETE"])
 def delete_booking(booking_id):
+    init_db()
+
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
@@ -133,7 +141,10 @@ def delete_booking(booking_id):
     if deleted_count == 0:
         return jsonify({"success": False, "message": "Booking not found"}), 404
 
-    return jsonify({"success": True, "message": "Booking deleted successfully"})
+    return jsonify({
+        "success": True,
+        "message": "Booking deleted successfully"
+    })
 
 
 if __name__ == "__main__":
