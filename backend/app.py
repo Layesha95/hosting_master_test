@@ -14,6 +14,7 @@ ADMIN_PASSWORD = "1234"
 
 
 def init_db():
+    os.makedirs(os.path.dirname(DB_FILE), exist_ok=True)
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
@@ -67,6 +68,8 @@ def login():
 @app.route("/booking", methods=["POST"])
 def create_booking():
     data = request.json
+
+    init_db()
 
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
